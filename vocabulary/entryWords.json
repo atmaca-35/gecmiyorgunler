@@ -1,0 +1,85 @@
+{
+  "entryWords": {
+   "a": {
+     "a": "s89 a “interjection for displeasure, contradiction, surprise, disappointment, or pity and (dialectal) interjection for emphasis” < s8 *ā “interjection that expresses various emotions”"
+   },
+   "abece": {
+     "a": "s89 abece “alphabet” < a combination of the name of the first three letters in Turkish alphabet; s89 a “alpha”, s89 be “beta” and s89 ce “gamma”."
+   },
+   "abımak": {
+     "a": "s31 -آبیٖ “to cover up” (Mahmud al-Kashgari, Dīwān Lughāt al-Turk) < s8 *apï- < s8 *ap- “(onom.) to close” + s8 *+ï- “emphasis suffix”."
+   },
+   "acıkmak": {
+     "a": "s89 acık- “(intransitive) to hunger; be hungry, feel hunger, feel peckish” < s71 آجیق “to be hungry, to hunger” < s8 *āčïk- < s8 *āč- “to hunger” (or another possibility s8 *āč “hunger”) + s8 *+ïk- “a suffix for verbs and nouns; makes reflexive and intransitive verbs” <br><br> Besides, s8 *āč- ≈ s8 *āč and the phrases /č/ and /č-/ point to a common root of unknown nature; s8 *ā- <br><br> See <span class='searchable'>ağ</span>."
+   },
+   "anlamak": {
+     "a": "s89 anla- “to understand, to comprehend, to get” < s71 -آكلا < s8 *aŋla- < s8 *aŋ “” + s8 *+la- <  <br><br> See <span class='searchable'>aç</span>."
+   },
+   "ağ": {
+     "a": "s89 ağ “a mesh of string, cord or rope” and besides “the silken structure which a spider builds using silk secreted from the spinnerets at the caudal tip of its abdomen; a spiderweb” < s8 *āg “trap; usually used for hunting” < it is certain that this word is cognate with s8 *āb “hunt, chase” (≈ sand s8 *āŋ “wild animal”"
+   },
+   "ağırmak": {
+     "a": "s89 ağır- “to shout (shout loudly); bağırmak” < s71 -آغر “to bray in an ugly voice; anırmak” < s71 -قر+ “suffix for onomatopoeias and interjections” + s71 آ “an interjection”<br><br>See <span class='searchable'>a</span>."
+   },
+   "az": {
+     "a": "t1 ɑz < p1 "
+   },
+   "iz": {
+     "a": "t1 iz < p1 *i- p1 +rʲ <br><br> Besides, p1 i- < p1 ið-"
+   },
+    "çatal": {
+     "a": "t1 çatal < p1 *çatıl < p1 *çat- *+ïl1"
+   },
+    "belirmek": {
+      "a": "t1 belir- “to appear” < o1 بلرمك < p1 *bẹl- “to keep in mind” + p1 *+gür- < p1 *bẹ “i” + p1 *+l-² <br><br> See <span class='searchable'>bilmek</span>."
+    },
+    "bilmek": {
+      "a": "t1 bil- “to know, understand, recognise” < p1 *bil- “to know” < p1 *bi “this” + p1 *+l-³ <br><br> See <span class='searchable'>bu</span>."
+    },
+    "bulmak": {
+      "a": "t1 bul- “to find, discover, invent, reach” < p1 *bul- “to find” < p1 *bu “this” + p1 *+l-³ <br><br> See <span class='searchable'>bu</span>."
+    },
+    "sarı": {
+      "a": "t1 sarı “yellow” ≈ g1 sarı < o1 صاری ≈ c1 шурӑ < p1 *sarïg “yellow, white” < p1 *sarï- “to become yellowish white” + p1 *+g <br><br> Besides, p1 *sarïg > p2 *siro “white”, p3 *sïra “yellow” <br><br> Besides, p1 *sarï- < p1 *saŕ “egg membrane” p1 *+ï- <br><br> See <span class='searchable'>sarmak</span>."
+    },
+    "kızıl": {
+      "a": "t1 kızıl “bright red, scarlet” ≈ g1 kızıl < o1 صاری ≈ c1 хӗрлӗ < p1 *kï̄zgïl “red” < p1 *kï̄zïg “redness” + p1 *+ïl2 <br><br> Besides, p1 *kï̄zïg < p1 *kï̄z- “to be hot, glow, redden” + p1 *+ïg <br><br> See <span class='searchable'>kızarmak</span>."
+    },
+    "diz": {
+      "a": "09 diz “knee” < 6 دیز  6 * “joint” < ptr *tī- “to straighten” + ptr *+ŕ <br><br> Besides, ptr *tī- < ppt *tīḏ- “to set”"
+    },
+    "diri": {
+      "a": "09 diri “alive”  < ptr *tīrig < ptr *tīri- “to live” + ptr *+g <br><br> See <span class='searchable'>dirilmek</span>."
+    },
+    "dirilmek": {
+      "a": "09 diril- “to come alive” < ota -دیرل ≈ otk -𐱅𐰃𐰼𐰠 < ptr *tīri- + ptr <br>*+i- <br><br> Besides, ptr *tīri- “to stand, arise” < ptr *tīŕ “joint” + ptr *+i- <br><br> See <span class='searchable'>diz</span>."
+    },
+    "dirsek": {
+      "a": "s89 dirsek “elbow” < s8 *tirsgek < s8 *tīrse- “to joint” + s8 *+gek <br><br> Besides, tuk tirse- “to turn, curl” < ptr *tīrse- < s8 *tīŕ “joint” + s8 *+se- <br><br> See <span class='searchable'>diz</span>."
+    },
+    "dik": {
+      "a": "tur dik “upright, vertical” < ota دیك < ptr *tīk < ptr *tī- “set up” + ptr *+k <br><br> See <span class='searchable'>dikmek</span>."
+    },
+    "dizmek": {
+      "a": "tur diz- “to line up” < ota -ديز ≈ otk -𐱅𐰃𐰼𐰠 < ptr *tīŕ- “to bead, string; arrange in a row” < ptr *tī- + ptr +ŕ- <br><br> See <span class='searchable'>diz</span>."
+    },
+    "diremek": {
+      "a": "s89 dire- “to resist, hold up, persist” < ota -ديز ≈ otk -𐱅𐰃𐰼𐰠 < *tīrig + ptr *+a- mahiyeti seviyorum <br><br> See <span class='searchable'>diri</span>. mahiyeti seviyorum"
+    },
+    "dirlik": {
+      "a": "s89 dirlik‎ harmealth, life” < ota  < oat tirlik < oat tiril- oat +k <br><br> See <span class='searchable'>dirilmek</span>."
+    },
+    "dikmek": {
+      "a": "s89 dik- “to erect, to plant” < s71 -دیك ≈ s69 -𐱅𐰃𐰚 < ptr *tīk- < ptr *tī- “set up” + ptr *+k- <br><br> See <span class='searchable'>diz</span>."
+    },
+    "ayak diremek": {
+      "a": "s89 ayak <span class='p'>dire-</span> “persist in” <br><br> See  <span class='searchable'>ayak</span>, <span class='searchable'>diremek</span>."
+    },
+    "ayak": {
+      "a": "s89 ayak “foot” < s71 آیاق ≈  s69 𐰑𐰴 < s8 *aḏak < s8 *aḏgak < s8 *aḏ- “to separate” + s8 *+gak <br><br> See <span class='searchable'>ayırmak</span>."
+    },
+    "ayırmak": {
+      "a": "s89 ayır- “to part; separate, choose, pick, select, distinguish” < s71 -آیر < s8 aḏïr- < s8 *aḏ- “to separate” + s8 *+ïr-"
+    }
+  }
+}
