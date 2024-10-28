@@ -485,13 +485,14 @@ document.getElementById('searchBox').addEventListener('input', updateTotalEntrie
 function updateTotalEntriesDisplay() {
     const searchBox = document.getElementById('searchBox');
     const totalEntriesElement = document.getElementById('totalEntries');
-    const query = searchBox.value.trim();
+    const query = searchBox.value;
+    const trimmedQuery = query.trim(); // Boşlukları kaldırarak sorguyu kontrol et
     const isError = searchContainer.classList.contains('error');
 
-    if (query === "" || isError) { // Eğer giriş hatalıysa veya boşsa kelime sayısını göster
+    if (trimmedQuery === "" || isError) { // Eğer giriş hatalıysa veya boşsa kelime sayısını göster
         const wordCount = Object.keys(entryWords).length;
         totalEntriesElement.textContent = `${wordCount}`;
-    } else if (dictionaryData[query]) { // Eğer sorgu bir girişle eşleşiyorsa kopya simgesini göster
+    } else if (dictionaryData[trimmedQuery] && !query.endsWith(" ")) { // Boşluksuz kelime eşleşiyorsa ve sonu boşluk değilse kopya simgesini göster
         totalEntriesElement.innerHTML = '<img src="images/copy.svg">';
     } else { // Sorgu bir girişle eşleşmiyorsa kelime sayısını göster
         const wordCount = Object.keys(entryWords).length;
@@ -499,12 +500,13 @@ function updateTotalEntriesDisplay() {
     }
 
     // URL hash güncellemesi, input'a göre her güncellemede çalışır
-    if (query) {
-        window.history.replaceState(null, null, `#${encodeURIComponent(query)}`);
+    if (trimmedQuery) {
+        window.history.replaceState(null, null, `#${encodeURIComponent(trimmedQuery)}`);
     } else {
         window.history.replaceState(null, null, `#`);
     }
 }
+
 
 
 // Add click event listener for totalEntries to handle copying or showing a random word
