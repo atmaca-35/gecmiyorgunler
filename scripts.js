@@ -96,28 +96,43 @@ function searchWord(query) {
     }
     lastQuery = query;
     
-    resultDiv.innerHTML = ''; // Clear result area
+    resultDiv.innerHTML = ''; // Sonuç alanını temizler
     
     if (query.startsWith(' ') || query.trim().length === 0) {
         if (query.length === 0) {
             searchContainer.classList.remove('error');
             ghostText.textContent = "";
-            lastCombinedText = ""; // Reset lastCombinedText if input is cleared
+            lastCombinedText = ""; // lastCombinedText sıfırlanır
             return;
         }
         searchContainer.classList.add('error');
         document.getElementById('totalEntries').textContent = `${Object.keys(dictionaryData).length}`;
         ghostText.textContent = "";
-        lastCombinedText = ""; // Reset lastCombinedText if there's an error
+        lastCombinedText = ""; // lastCombinedText sıfırlanır
         return;
     } else {
         searchContainer.classList.remove('error');
     }
 
     const normalizedQuery = normalizeTurkish(query);
-    const closestWord = Object.keys(dictionaryData)
+
+    // Önce tam eşleşme olup olmadığını kontrol edelim
+    const exactMatch = Object.keys(dictionaryData).find(word => normalizeTurkish(word) === normalizedQuery);
+
+    // Eğer tam eşleşme varsa bunu göster, yoksa startsWith kullan
+    let closestWord;
+if (exactMatch) {
+    closestWord = { word: normalizeTurkish(exactMatch), original: exactMatch };
+} else {
+    const possibleMatches = Object.keys(dictionaryData)
         .map(word => ({ word: normalizeTurkish(word), original: word }))
-        .find(({ word }) => word.startsWith(normalizedQuery));
+        .filter(({ word }) => word.startsWith(normalizedQuery));
+
+    // Kelimeleri uzunluğuna göre sırala ve en kısa olanı seç
+    if (possibleMatches.length > 0) {
+        closestWord = possibleMatches.sort((a, b) => a.word.length - b.word.length)[0];
+    }
+}
 
     if (closestWord) {
         const wordDetails = dictionaryData[closestWord.original];
@@ -128,33 +143,34 @@ function searchWord(query) {
         
         resultDiv.appendChild(descriptionElement);
 
-        // Compute the new combined text (query + ghostText)
+        // Yeni ghostText oluştur ve combine text ile kıyasla
         const newGhostText = closestWord.word.substring(query.length);
         const newCombinedText = query + newGhostText;
 
-        // Check if the new combined text is different from the last one
+        // Yeni ghost-text ile eskiyi kıyasla ve fade-in animasyonunu çalıştır
         if (newCombinedText !== lastCombinedText) {
             ghostText.textContent = newGhostText;
-            lastCombinedText = newCombinedText; // Update lastCombinedText
+            lastCombinedText = newCombinedText;
 
-            // Trigger animations only when a new combined text is selected
+            // Fade-in animasyonu resultDiv'e uygula
+            resultDiv.style.animation = 'none'; 
+            resultDiv.offsetHeight; 
             resultDiv.style.animation = 'fadeIn 1s ease-in-out';
+
             loadAnimation();
         }
     } else {
         ghostText.textContent = "";
-        lastCombinedText = ""; // Reset lastCombinedText if no match is found
+        lastCombinedText = ""; 
         searchContainer.classList.add('error');
         document.getElementById('totalEntries').textContent = `${Object.keys(dictionaryData).length}`;
     }
 
-    resultDiv.style.animation = 'none';
-    resultDiv.offsetHeight;
-    resultDiv.style.animation = 'fadeIn 1s ease-in-out';
-
-    // Ensure createClickableWords() is always called
+    // createClickableWords her zaman çalışsın
     createClickableWords();
 }
+
+
 
 
     
