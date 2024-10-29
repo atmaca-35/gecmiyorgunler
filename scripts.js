@@ -91,24 +91,22 @@ let lastGhostText = "";
 let lastCombinedText = "";
 
 function searchWord(query) {
-    if (query === lastQuery) {
-        return;
-    }
+    if (query === lastQuery) return;
+
     lastQuery = query;
-    
-    resultDiv.innerHTML = ''; // Sonuç alanını temizler
-    
+    resultDiv.innerHTML = ''; // Clear result area
+
     if (query.startsWith(' ') || query.trim().length === 0) {
         if (query.length === 0) {
             searchContainer.classList.remove('error');
             ghostText.textContent = "";
-            lastCombinedText = ""; // lastCombinedText sıfırlanır
+            lastCombinedText = ""; 
             return;
         }
         searchContainer.classList.add('error');
         document.getElementById('totalEntries').textContent = `${Object.keys(dictionaryData).length}`;
         ghostText.textContent = "";
-        lastCombinedText = ""; // lastCombinedText sıfırlanır
+        lastCombinedText = ""; 
         return;
     } else {
         searchContainer.classList.remove('error');
@@ -116,25 +114,14 @@ function searchWord(query) {
 
     const normalizedQuery = normalizeTurkish(query);
 
-    // Önce tam eşleşme olup olmadığını kontrol edelim
-    const exactMatch = Object.keys(dictionaryData).find(word => normalizeTurkish(word) === normalizedQuery);
-
-    // Eğer tam eşleşme varsa bunu göster, yoksa startsWith kullan
-    let closestWord;
-if (exactMatch) {
-    closestWord = { word: normalizeTurkish(exactMatch), original: exactMatch };
-} else {
-    const possibleMatches = Object.keys(dictionaryData)
+    // Find the closest alphabetically matching word
+    const matchingWords = Object.keys(dictionaryData)
         .map(word => ({ word: normalizeTurkish(word), original: word }))
-        .filter(({ word }) => word.startsWith(normalizedQuery));
+        .filter(({ word }) => word.startsWith(normalizedQuery))
+        .sort((a, b) => a.word.localeCompare(b.word));
 
-    // Kelimeleri uzunluğuna göre sırala ve en kısa olanı seç
-    if (possibleMatches.length > 0) {
-        closestWord = possibleMatches.sort((a, b) => a.word.length - b.word.length)[0];
-    }
-}
-
-    if (closestWord) {
+    if (matchingWords.length > 0) {
+        const closestWord = matchingWords[0];
         const wordDetails = dictionaryData[closestWord.original];
         const description = wordDetails.a.replace(/\n/g, "<br>");
         const descriptionElement = document.createElement('p');
@@ -143,16 +130,15 @@ if (exactMatch) {
         
         resultDiv.appendChild(descriptionElement);
 
-        // Yeni ghostText oluştur ve combine text ile kıyasla
+        // Update ghost text with the closest alphabetic match
         const newGhostText = closestWord.word.substring(query.length);
         const newCombinedText = query + newGhostText;
 
-        // Yeni ghost-text ile eskiyi kıyasla ve fade-in animasyonunu çalıştır
         if (newCombinedText !== lastCombinedText) {
             ghostText.textContent = newGhostText;
             lastCombinedText = newCombinedText;
 
-            // Fade-in animasyonu resultDiv'e uygula
+            // Fade-in animation for resultDiv
             resultDiv.style.animation = 'none'; 
             resultDiv.offsetHeight; 
             resultDiv.style.animation = 'fadeIn 1s ease-in-out';
@@ -166,9 +152,9 @@ if (exactMatch) {
         document.getElementById('totalEntries').textContent = `${Object.keys(dictionaryData).length}`;
     }
 
-    // createClickableWords her zaman çalışsın
     createClickableWords();
 }
+
 
 
 
