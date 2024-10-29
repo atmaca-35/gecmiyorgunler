@@ -18,18 +18,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     let typeWords = {};
 
     function loadSearchFromHash() {
-        if (!isVocabularyLoaded) return;
-        const hash = decodeURIComponent(window.location.hash.substring(1));
-        if (hash) {
-            searchBox.value = hash;
-            updateSearch(hash);
-            updateSearchBoxPlaceholder(hash);
-    
-            // Hash değeri tam bir kelimeyse copy ikonunu göster
-            updateTotalEntriesDisplay();
-        }
+    if (!isVocabularyLoaded) return;
+    const hash = decodeURIComponent(window.location.hash.substring(1));
+    if (hash) {
+        searchBox.value = hash;
+        updateSearch(hash);
+        updateSearchBoxPlaceholder(hash);
+
+        // Hash değeri tam bir kelimeyse copy ikonunu göster
+        updateTotalEntriesDisplay();
     }
-    
+}
+
 
     window.addEventListener('load', async () => {
         if (!window.location.hash || window.location.hash === "#") {
@@ -354,40 +354,66 @@ function searchWord(query) {
 
     let headings = [];
 
-async function loadData() {
-    try {
-        const clickableWordsResponse = await fetch('vocabulary/clickableWords.json');
-        const clickableWordsJson = await clickableWordsResponse.json();
-        clickableWords = clickableWordsJson.clickableWords;
-        
-        const specialWordsResponse = await fetch('vocabulary/specialWords.json');
-        const specialWordsJson = await specialWordsResponse.json();
-        specialWords = specialWordsJson.specialWords;
-        
-        const entryWordsResponse = await fetch('vocabulary/entryWords.json');
-        const entryWordsJson = await entryWordsResponse.json();
-        entryWords = entryWordsJson.entryWords;
-        
-        const typeWordsResponse = await fetch('vocabulary/typeWords.json');
-        const typeWordsJson = await typeWordsResponse.json();
-        typeWords = typeWordsJson.typeWords;
-        headings = Object.keys(entryWords); // Store headings for quick matching
-
-        dictionaryData = entryWords;
-
-        wrapClickableWords();
-
-        // Show total entry count by default
+    async function loadData() {
         const totalEntriesElement = document.getElementById('totalEntries');
-        const wordCount = Object.keys(entryWords).length;
-        totalEntriesElement.textContent = `${wordCount}`;
-
-        isVocabularyLoaded = true;
-        return true;
-    } catch (error) {
-        console.error('Oops!', error);
+        const searchBox = document.getElementById('searchBox');
+        let allDataLoaded = true;
+    
+        try {
+            // clickableWords.json yüklemesi
+            const clickableWordsResponse = await fetch('vocabulary/clickableWords.json');
+            if (!clickableWordsResponse.ok) throw new Error('clickableWords yüklenemedi');
+            const clickableWordsJson = await clickableWordsResponse.json();
+            clickableWords = clickableWordsJson.clickableWords;
+    
+            // specialWords.json yüklemesi
+            const specialWordsResponse = await fetch('vocabulary/specialWords.json');
+            if (!specialWordsResponse.ok) throw new Error('specialWords yüklenemedi');
+            const specialWordsJson = await specialWordsResponse.json();
+            specialWords = specialWordsJson.specialWords;
+    
+            // entryWords.json yüklemesi
+            const entryWordsResponse = await fetch('vocabulary/entryWords.json');
+            if (!entryWordsResponse.ok) throw new Error('entryWords yüklenemedi');
+            const entryWordsJson = await entryWordsResponse.json();
+            entryWords = entryWordsJson.entryWords;
+    
+            // typeWords.json yüklemesi
+            const typeWordsResponse = await fetch('vocabulary/typeWords.json');
+            if (!typeWordsResponse.ok) throw new Error('typeWords yüklenemedi');
+            const typeWordsJson = await typeWordsResponse.json();
+            typeWords = typeWordsJson.typeWords;
+    
+            // Başarıyla yüklendiyse toplam kelime sayısını göster
+            const wordCount = Object.keys(entryWords).length;
+            totalEntriesElement.textContent = `${wordCount}`;
+    
+            dictionaryData = entryWords;
+            wrapClickableWords();
+            changeCssVariable();
+            isVocabularyLoaded = true;
+    
+            // Arama çubuğunu etkinleştir
+            searchBox.disabled = false;
+    
+        } catch (error) {
+            console.error('Hata:', error);
+            allDataLoaded = false;
+        }
+    
+        // Eğer herhangi bir dosya eksikse:
+        if (!allDataLoaded) {
+            totalEntriesElement.innerHTML = '<img src="images/error.svg" width="20" height="20">';
+            document.documentElement.style.setProperty('--main-red', '#dc3545');
+    
+            // Arama çubuğunu devre dışı bırak
+            searchBox.disabled = true;
+        }
     }
-}
+    
+    
+    
+    
 
 let loaderAnimationTimeout = null;
 function loadAnimation() {
@@ -453,8 +479,24 @@ fetch('vocabulary/entryWords.json')
     }
   })
   .then(data => {
+    // Update CSS variables as needed
     changeCssVariable();
+
+    // Get the total entries and display the count
+    const totalEntriesElement = document.getElementById('totalEntries');
+    const wordCount = Object.keys(data.entryWords).length;
+    totalEntriesElement.textContent = `${wordCount}`;
+  })
+  .catch(error => {
+    console.error(error);
+
+    // Show error icon if the file load fails
+    const totalEntriesElement = document.getElementById('totalEntries');
+    totalEntriesElement.innerHTML = '<img src="images/error.svg" width="20" height="20">';
   });
+
+
+  
 
     searchBox.addEventListener('input', () => {
         const query = searchBox.value;
