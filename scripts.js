@@ -24,8 +24,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             searchBox.value = hash;
             updateSearch(hash);
             updateSearchBoxPlaceholder(hash);
+    
+            // Hash değeri tam bir kelimeyse copy ikonunu göster
+            updateTotalEntriesDisplay();
         }
     }
+    
 
     window.addEventListener('load', async () => {
         if (!window.location.hash || window.location.hash === "#") {
