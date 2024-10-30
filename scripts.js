@@ -27,7 +27,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             clickableWords();
         }
     }
-
+    function toTurkishLowerCase(str) {
+        return str
+            .replace(/I/g, 'ı')
+            .replace(/İ/g, 'i')
+            .replace(/Ğ/g, 'ğ')
+            .replace(/Ü/g, 'ü')
+            .replace(/Ş/g, 'ş')
+            .replace(/Ö/g, 'ö')
+            .replace(/Ç/g, 'ç')
+            .toLowerCase();
+    }
+    
+    
     window.addEventListener('load', async () => {
         if (!window.location.hash || window.location.hash === "#") {
             window.location.hash = '#';
@@ -60,20 +72,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     searchBox.addEventListener('input', (e) => {
-        let query = e.target.value.toLowerCase();
-
-        query = query.replace(/[^abcçdefgğhıijklmnoöprsştuüvyz ]/g, '');
-
-        // Prevent multiple spaces in a row
+        let query = e.target.value;
+    
+        // Türkçe büyük harfleri küçük harfe dönüştür
+        query = toTurkishLowerCase(query);
+    
+        // Alfanumerik ve boşluk dışındaki karakterleri kaldır
+        query = query.replace(/[^abcçdefgğhıijklmnoöprsştuüvyz ]/gi, '');
+    
+        // Birden fazla ardışık boşluğu tek boşluğa indir
         query = query.replace(/\s{2,}/g, ' ');
-
-        e.target.value = query;
-
+    
+        e.target.value = query; // Güncellenmiş değeri arama kutusuna yazdır
+    
         updateSearchBoxPlaceholder(query);
         searchWord(query);
     });
-
+    
+    
     function updateSearch(query) {
+        const formattedQuery = toTurkishLowerCase(query);
+        
         if (dictionaryData && Object.keys(dictionaryData).length > 0) {
             searchWord(query);
 
