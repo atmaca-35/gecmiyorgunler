@@ -18,7 +18,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load the hash into the search box and trigger the search
     function loadSearchFromHash() {
         if (!isVocabularyLoaded) return;
-        const hash = decodeURIComponent(window.location.hash.substring(1));
+        
+        let hash = decodeURIComponent(window.location.hash.substring(1)).toLowerCase();
+        
+        // Geçerli olmayan karakterleri kaldır
+        const cleanedHash = hash.replace(/[^abcçdefgğhıijklmnoöprsştuüvyz ]/gi, '');
+    
+        // Eğer hash temizlenmişse, hash'i ve searchBox değerini güncelleyin
+        if (cleanedHash !== hash) {
+            hash = cleanedHash;
+            window.history.replaceState(null, null, `#${encodeURIComponent(cleanedHash)}`);
+        }
+    
         if (hash) {
             searchBox.value = hash;
             updateSearch(hash);
@@ -27,6 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             clickableWords();
         }
     }
+    
     function toTurkishLowerCase(str) {
         return str
             .replace(/I/g, 'ı')
@@ -91,14 +103,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     
     function updateSearch(query) {
-        const formattedQuery = toTurkishLowerCase(query);
-        
+        const formattedQuery = toTurkishLowerCase(query).toLowerCase(); // Küçük harfe çevir
+    
         if (dictionaryData && Object.keys(dictionaryData).length > 0) {
-            searchWord(query);
-
+            searchWord(formattedQuery);
+    
             // Instantly update the hash in the URL
             if (query) {
-                window.history.replaceState(null, null, `#${encodeURIComponent(query)}`);
+                window.history.replaceState(null, null, `#${encodeURIComponent(formattedQuery)}`);
             } else {
                 window.history.replaceState(null, null, `#`);
             }
