@@ -18,22 +18,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load the hash into the search box and trigger the search
     function loadSearchFromHash() {
         if (!isVocabularyLoaded) return;
-        
-        let hash = decodeURIComponent(window.location.hash.substring(1)).toLowerCase();
-        
-        // Geçerli olmayan karakterleri kaldır
-        const cleanedHash = hash.replace(/[^abcçdefgğhıijklmnoöprsştuüvyz ]/gi, '');
     
-        // Eğer hash temizlenmişse, hash'i ve searchBox değerini güncelleyin
-        if (cleanedHash !== hash) {
-            hash = cleanedHash;
+        let hash = decodeURIComponent(window.location.hash.substring(1));
+    
+        // Convert to lowercase with Turkish-specific rules
+        hash = toTurkishLowerCase(hash);
+    
+        // Remove invalid characters, allow only Turkish alphabet and space
+        const cleanedHash = hash.replace(/[^abcçdefgğhıijklmnoöprsştuüvyz ]/g, '');
+    
+        // Redirect based on the conditions outlined
+        if (cleanedHash === "") {
+            window.history.replaceState(null, null, `/`);
+        } else {
             window.history.replaceState(null, null, `#${encodeURIComponent(cleanedHash)}`);
         }
     
-        if (hash) {
-            searchBox.value = hash;
-            updateSearch(hash);
-            updateSearchBoxPlaceholder(hash);
+        // Apply the cleaned hash to search box and initiate the search
+        if (cleanedHash) {
+            searchBox.value = cleanedHash;
+            updateSearch(cleanedHash);
+            updateSearchBoxPlaceholder(cleanedHash);
             updateTotalEntriesDisplay();
             clickableWords();
         }
@@ -51,6 +56,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             .toLowerCase();
     }
     
+    // Ensure this function is called when the hash changes
+    window.addEventListener('hashchange', loadSearchFromHash);
     
     window.addEventListener('load', async () => {
         if (!window.location.hash || window.location.hash === "#") {
