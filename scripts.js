@@ -117,21 +117,23 @@ function searchWord(query) {
     lastQuery = query;
     resultDiv.innerHTML = ''; // Clear result area
 
-    if (query.startsWith(' ') || query.trim().length === 0) {
-        if (query.length === 0) {
-            searchContainer.classList.remove('error');
-            ghostText.textContent = "";
-            lastCombinedText = ""; 
-            return;
-        }
+    // Handle case for empty input
+    if (query.trim().length === 0) {
+        searchContainer.classList.remove('error');
+        ghostText.textContent = "";
+        wordCountElement.style.backgroundColor = ''; // Reset background color to green
+        lastCombinedText = ""; 
+        return;
+    } else if (query.startsWith(' ')) {
+        // Error state if input starts with a space
         searchContainer.classList.add('error');
-        document.getElementById('totalEntries').textContent = `${Object.keys(dictionaryData).length}`;
+        wordCountElement.style.backgroundColor = '#dc3545'; // Set background color to red
         ghostText.textContent = "";
         lastCombinedText = ""; 
         return;
     } else {
         searchContainer.classList.remove('error');
-        wordCountElement.style.backgroundColor = '';
+        wordCountElement.style.backgroundColor = ''; // Reset background color if valid input
     }
 
     const normalizedQuery = normalizeTurkish(query);
@@ -170,7 +172,7 @@ function searchWord(query) {
     } else {
         ghostText.textContent = "";
         lastCombinedText = ""; 
-        wordCountElement.style.backgroundColor = '#dc3545'; // Change background color
+        wordCountElement.style.backgroundColor = '#dc3545'; // Change background color to red
         searchContainer.classList.add('error');
         document.getElementById('totalEntries').textContent = `${Object.keys(dictionaryData).length}`;
     }
