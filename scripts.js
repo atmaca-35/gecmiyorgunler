@@ -621,6 +621,35 @@ document.getElementById('totalEntries').addEventListener('click', async () => {
         }
     }
 });
+async function copyToClipboard() {
+    const totalEntriesElement = document.getElementById('totalEntries');
+    const searchBox = document.getElementById('searchBox');
+    const query = searchBox.value.trim();
+
+    // Kopyalama işlemi ve içerik ayarları
+    if (dictionaryData[query]) {
+        const descriptionElement = document.querySelector('#result .description');
+        const description = descriptionElement ? descriptionElement.textContent.trim() : '';
+        const clipboardContent = `${query}\n\n${description}`;
+
+        try {
+            await navigator.clipboard.writeText(clipboardContent);
+
+            // Kopyalama başarılı olduğunda 'copied' sınıfını ekleyin
+            totalEntriesElement.classList.add('copied');
+            
+            // 'Copied!' baloncuğunu 1.5 saniye sonra gizlemek için zamanlayıcı
+            setTimeout(() => {
+                totalEntriesElement.classList.remove('copied');
+            }, 500);
+        } catch (err) {
+            console.error('Panoya kopyalanamadı:', err);
+        }
+    }
+}
+
+// totalEntries butonuna tıklandığında kopyalama işlemini başlatın
+document.getElementById('totalEntries').addEventListener('click', copyToClipboard);
 
 
     
