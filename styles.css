@@ -476,6 +476,28 @@ main {
    opacity: 0.7;
 }
 
+#totalEntries.copied::after {
+    content: "Copied!";
+    position: absolute;
+    top: -38px; /* Yüksekliği ve konumunu ayarlayın */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #2d6536; /* Yeşil arka plan */
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none; /* Baloncuk tıklanamaz */
+    font-family: 'poppins' sans-serif;
+    font-weight: 400;
+}
+
+#totalEntries.copied::after {
+    opacity: 1;
+}
+
 .footer-right {
     font-size: 14px;
     color: #ffffff;
