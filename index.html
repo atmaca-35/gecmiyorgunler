@@ -17,15 +17,19 @@
                     <div class="animated-text" id="animatedText"></div>
                     <input type="text" id="searchBox">
                     <span id="ghostText" class="ghost-text"></span>
-                    <sl-copy-button id="copyButton" value="Shoelace rocks!" copy-label=" " success-label=" " tooltip__body=" "></sl-copy-button>
-                  
-
+                    <sl-copy-button 
+    id="copyButton" 
+    value="Shoelace rocks!" 
+    copy-label="" 
+    success-label="" 
+    error-label=""
+    style="color: var(--main-aluminium);"
+    disabled
+></sl-copy-button>
                 </div>
                 <div class="selected-word-meanings" id="selectedWordMeanings"></div>
             </div>
             <div class="result" id="result"></div>
-            
-            
         </div>
         <div class="Loader"></div>
     </main>
