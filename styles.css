@@ -350,7 +350,7 @@ main {
     transform: translateY(-50%);
     display: inline-flex;
     align-items: center;
-    color: #dc3545; /* Kırmızı renk */
+    
   
     cursor: not-allowed; /* Tıklanamaz ikon */
 }
