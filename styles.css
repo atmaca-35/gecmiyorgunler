@@ -323,7 +323,6 @@ main {
     font-family: 'poppins';
 }
 
-
 @keyframes slideInOut {
     0% {
         opacity: 0;
@@ -344,7 +343,6 @@ main {
 }
 
 
-
 #copyButton {
     position: absolute;
     right: 25px;
@@ -355,12 +353,4 @@ main {
     color: #dc3545; /* Kırmızı renk */
   
     cursor: not-allowed; /* Tıklanamaz ikon */
-}
-
-@keyframes shake {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    50% { transform: translateX(5px); }
-    75% { transform: translateX(-5px); }
-    100% { transform: translateX(0); }
 }
