@@ -448,6 +448,19 @@ searchBox.addEventListener('input', () => {
         });
     }
 });
+searchBox.addEventListener('focus', () => {
+    if (!searchBox.value.trim()) {
+        copyButton.style.color = 'var(--main-aluminium)';
+        copyButton.disabled = true;
+        copyButton.style.display = 'block';
+    }
+});
+
+searchBox.addEventListener('blur', () => {
+    if (!searchBox.value.trim()) {
+        copyButton.style.display = 'none';
+    }
+});
 
 copyButton.style.display = 'none';
     const animatedText = document.getElementById('animatedText');
