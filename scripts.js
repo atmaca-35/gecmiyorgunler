@@ -14,16 +14,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     let typeWords = {};
     let wordIndex = 0;
     let animationInterval;
-    let words = ["entries", "suffixes", "languages"];  // Başlangıç değeri
+    let words = ["entries", "suffixes", "languages"];  
     function loadSearchFromHash() {
         if (!isVocabularyLoaded) return;
-    
         let hash = decodeURIComponent(window.location.hash.substring(1));
         hash = toTurkishLowerCase(hash);
         const cleanedHash = hash.replace(/[^abcçdefgğhıijklmnoöprsştuüvyz ]/g, '');
     
         if (cleanedHash === "") {
-            // URL boş ise ana sayfaya yönlendir ve copyButton'ı gizle
             window.history.replaceState(null, null, `/`);
             copyButton.style.display = 'none';
         } else {
@@ -31,8 +29,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             searchBox.value = cleanedHash;
             updateSearch(cleanedHash);
             updateSearchBoxPlaceholder(cleanedHash);
-            
-            // copyButton'ı güncelle
             updateCopyButton();
         }
     }
@@ -81,6 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const tooltips = document.querySelectorAll('.tooltip');
         tooltips.forEach(tooltip => tooltip.remove());
+        
     });
 
     searchBox.addEventListener('input', (e) => {
@@ -93,18 +90,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.target.value = query;
     
         updateSearchBoxPlaceholder(query);
-        updateSearch(query); // Güncellenen arama sorgusunu updateSearch ile işliyoruz
+        updateSearch(query); 
     });
-    
-    
     
     function updateSearch(query) {
         const formattedQuery = toTurkishLowerCase(query).toLowerCase(); 
         
         if (dictionaryData && Object.keys(dictionaryData).length > 0) {
             searchWord(formattedQuery);
-    
-            // URL’yi anlık olarak güncelle
             if (query) {
                 window.history.replaceState(null, null, `#${encodeURIComponent(formattedQuery)}`);
             } else {
@@ -114,10 +107,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Dictionary data not loaded.');
         }
     }
-    
-
-let lastGhostText = "";
-
 let lastCombinedText = "";
 
 function searchWord(query) {
@@ -126,13 +115,10 @@ function searchWord(query) {
     const searchContainer = document.querySelector('.search-box');
     const ghostText = document.getElementById('ghostText');
 
-    // Aynı sorgu tekrar girildiyse işlemi durdur
     if (query === lastQuery) return;
 
     lastQuery = query;
-    resultDiv.innerHTML = ''; // Sonuç alanını temizle
-
-    // Eğer sorgu boşsa veya geçersizse işlemi durdur ve copyButton'ı gizle
+    resultDiv.innerHTML = ''; 
     if (query.trim().length === 0) {
         searchContainer.classList.remove('error');
         searchBox.classList.remove('error');
@@ -151,28 +137,19 @@ function searchWord(query) {
         searchContainer.classList.remove('error');
         searchBox.classList.remove('error');
     }
-
     const normalizedQuery = normalizeTurkish(query);
-
-    // Eşleşen kelimeleri bul
     const matchingWords = Object.keys(dictionaryData)
         .map(word => ({ word: normalizeTurkish(word), original: word }))
         .filter(({ word }) => word.startsWith(normalizedQuery))
         .sort((a, b) => a.word.localeCompare(b.word));
-
-    // Eşleşme durumuna göre copyButton'ı etkin veya pasif yap
     if (matchingWords.length > 0) {
-        // Eşleşme bulunduysa buton rengi --main-aluminium ve etkin
-        copyButton.style.color = 'var(--main-aluminium)';
+        copyButton.style.color = 'var(--main-silver)';
         copyButton.style.display = 'block';
-        copyButton.disabled = false; // Butonu etkinleştir
+        copyButton.disabled = false; 
     } else {
-        // Eşleşme yoksa buton rengi kırmızı (#dc3545) ve pasif
         copyButton.style.color = '#dc3545';
-        copyButton.disabled = true; // Butonu pasif yap
+        copyButton.disabled = true; 
     }
-
-    // Eşleşen kelime varsa sonuçları göster
     if (matchingWords.length > 0) {
         searchContainer.classList.remove('error');
         searchBox.classList.remove('error');
@@ -198,9 +175,8 @@ function searchWord(query) {
             loadAnimation();
         }
 
-        copyButton.style.display = 'block'; // Butonu göster
+        copyButton.style.display = 'block';
     } else {
-        // Eşleşme yoksa hata durumunu ayarla
         ghostText.textContent = "";
         lastCombinedText = ""; 
         searchContainer.classList.add('error');
@@ -209,12 +185,6 @@ function searchWord(query) {
 
     createClickableWords();
 }
-
-
-
-
-
-
   document.addEventListener('contextmenu', event => event.preventDefault());
 
   document.addEventListener('keydown', (event) => {
@@ -412,8 +382,6 @@ function searchWord(query) {
             wrapClickableWords();
             isVocabularyLoaded = true;
             searchBox.disabled = false;
-
-            // `words` dizisini JSON dosyalarındaki kelime sayılarına göre güncelle
             words = [
                 `${Object.keys(entryWords).length} entries`,
                 `${Object.keys(clickableWords).length} suffixes`,
@@ -430,7 +398,6 @@ function searchWord(query) {
         return allDataLoaded;
     }
     
-
 let loaderAnimationTimeout = null;
 function loadAnimation() {
     if (loaderAnimationTimeout) window.clearTimeout(loaderAnimationTimeout);
@@ -448,7 +415,6 @@ function loadAnimation() {
         return context.measureText(text).width;
     }
     
-    
 const copyButton = document.getElementById('copyButton');
 
 searchBox.addEventListener('input', () => {
@@ -456,11 +422,8 @@ searchBox.addEventListener('input', () => {
     updateSearchBoxPlaceholder(query);
     searchWord(query);
 
-    // Show or hide the copy button based on input content
     copyButton.style.display = query.length > 0 ? 'block' : 'none';
 });
-
-
     document.querySelector('#result').addEventListener('click', (e) => {
         if (e.target.classList.contains('searchable')) {
             const searchbox = document.querySelector('#searchBox');
@@ -497,20 +460,16 @@ copyButton.style.display = 'none';
         animatedText.style.display = 'block';
         animatedText.textContent = words[wordIndex];
         animatedText.style.animation = 'none';
-        void animatedText.offsetWidth;  // Reflow tetikleme
+        void animatedText.offsetWidth;  
         animatedText.style.animation = 'slideInOut 2s ease-in-out';
 
         wordIndex = (wordIndex + 1) % words.length;
         animationInterval = setTimeout(animateText, 2000);
     }
-
-    // `loadData` tamamlandığında animasyon başlasın
     const dataLoaded = await loadData();
     if (dataLoaded && !searchBox.value) {
-        setTimeout(animateText, 500);  // 0.5 saniye sonra animasyonu başlat
+        setTimeout(animateText, 500);  
     }
-
-    // `input` olayında animasyonu kontrol et
     searchBox.addEventListener('input', () => {
         if (searchBox.value) {
             animatedText.style.display = 'none';
@@ -518,44 +477,57 @@ copyButton.style.display = 'none';
             animateText();
         }
     });
-
-    // `focus` olayında animasyonu durdur
     searchBox.addEventListener('focus', () => {
         animatedText.style.display = 'none';
         clearTimeout(animationInterval);
     });
-
-    // `blur` olayında ve `searchBox` boşsa animasyonu başlat
     searchBox.addEventListener('blur', () => {
         if (!searchBox.value) animateText();
     });
     function updateCopyButton() {
+        const searchBox = document.getElementById('searchBox');
+        const copyButton = document.getElementById('copyButton');
         const query = searchBox.value.trim();
-        
+    
         if (query) {
-            // Query ile eşleşen bir kelime olup olmadığını kontrol et
             const normalizedQuery = normalizeTurkish(query);
             const matchingWords = Object.keys(dictionaryData)
                 .map(word => normalizeTurkish(word))
                 .filter(word => word.startsWith(normalizedQuery));
     
             if (matchingWords.length > 0) {
-                // Eşleşme bulunduğunda, buton görünür ve --main-aluminium renginde olur
-                copyButton.style.display = 'block';
-                copyButton.style.color = 'var(--main-aluminium)';
+                copyButton.style.color = 'var(--main-silver)';
                 copyButton.disabled = false;
             } else {
-                // Eşleşme bulunmadığında, buton kırmızı (#dc3545) olur ve pasif hale gelir
-                copyButton.style.display = 'block';
                 copyButton.style.color = '#dc3545';
                 copyButton.disabled = true;
             }
         } else {
-            // Sorgu boş olduğunda butonu gizle
-            copyButton.style.display = 'none';
+            copyButton.style.color = 'var(--main-aluminium)';
             copyButton.disabled = true;
         }
+        copyButton.style.display = 'block';
     }
-    
-    
+searchBox.addEventListener('focus', () => {
+    if (!searchBox.value.trim()) {
+        copyButton.style.color = 'var(--main-aluminium)';
+        copyButton.disabled = true;
+        copyButton.style.display = 'block';
+    }
+    if (window.location.hash !== '#') {
+        window.history.replaceState(null, null, '#');
+    }
+
+});
+
+searchBox.addEventListener('blur', () => {
+    if (!searchBox.value.trim()) {
+        copyButton.style.display = 'none';
+        if (window.location.hash === '#') {
+            window.history.replaceState(null, null, window.location.pathname);
+        }
+    }
+});
+    searchBox.addEventListener('input', updateCopyButton);
+   
 });
