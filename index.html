@@ -12,30 +12,25 @@
         <div class="container">
             <div class="search-container">
                 <div id="errorContainer"></div>
-                <p class="word-count">Archaeology of the Proto-Turkic</p>
+                <p class="word-count">from Proto Turkish to Turkish in</p>
                 <div class="search-box" id="searchBoxContainer">
+                    <div class="animated-text" id="animatedText"></div>
                     <input type="text" id="searchBox">
                     <span id="ghostText" class="ghost-text"></span>
+                    <sl-copy-button id="copyButton" value="Shoelace rocks!" copy-label=" " success-label=" " tooltip__body=" "></sl-copy-button>
+                  
+
                 </div>
                 <div class="selected-word-meanings" id="selectedWordMeanings"></div>
             </div>
             <div class="result" id="result"></div>
+            
+            
         </div>
-
         <div class="Loader"></div>
-        
-        <footer class="footer">
-            <div class="footer-left">bitibook</div>
-            <div class="footer-center">
-                <div id="totalEntries">
-                    <img src="images/error.svg" width="20" height="20">
-                </div>
-            </div>
-            <a href="x" class="footer-right">contact & donate</a>
-        </footer>
     </main>
-
     <script src="scripts.js" defer onerror="handleScriptError()"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.9/purify.min.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.18.0/cdn/shoelace.js"></script>
 </body>
 </html>
