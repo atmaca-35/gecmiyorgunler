@@ -508,26 +508,7 @@ copyButton.style.display = 'none';
         }
         copyButton.style.display = 'block';
     }
-searchBox.addEventListener('focus', () => {
-    if (!searchBox.value.trim()) {
-        copyButton.style.color = 'var(--main-aluminium)';
-        copyButton.disabled = true;
-        copyButton.style.display = 'block';
-    }
-    if (window.location.hash !== '#') {
-        window.history.replaceState(null, null, '#');
-    }
 
-});
-
-searchBox.addEventListener('blur', () => {
-    if (!searchBox.value.trim()) {
-        copyButton.style.display = 'none';
-        if (window.location.hash === '#') {
-            window.history.replaceState(null, null, window.location.pathname);
-        }
-    }
-});
     searchBox.addEventListener('input', updateCopyButton);
    copyButton.addEventListener('click', () => {
         // Change color to light green on click
