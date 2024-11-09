@@ -529,5 +529,14 @@ searchBox.addEventListener('blur', () => {
     }
 });
     searchBox.addEventListener('input', updateCopyButton);
-   
+   copyButton.addEventListener('click', () => {
+        // Change color to light green on click
+        copyButton.style.color = '#90ee90'; // Light green color (you can adjust if needed)
+    
+        // Revert to original color after 250 ms
+        setTimeout(() => {
+            copyButton.style.color = ''; // Reset to default color
+        }, 1480);
+    });
+    
 });
