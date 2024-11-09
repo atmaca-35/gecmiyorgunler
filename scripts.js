@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const resultDiv = document.getElementById('result');
     const ghostText = document.getElementById('ghostText');
     const searchContainer = document.querySelector('.search-box');
-    const wordCountElement = document.getElementById('totalEntries');
 
     let dictionaryData = {};
     let clickableWords = {};
@@ -11,38 +10,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     let specialWords = {};
     let currentMeaningIndex = {};
     let lastQuery = '';
-    let hasError = false;
     let isVocabularyLoaded = false;
     let typeWords = {};
-
-    // Load the hash into the search box and trigger the search
+    let wordIndex = 0;
+    let animationInterval;
+    let words = ["entries", "suffixes", "languages"];  // Başlangıç değeri
     function loadSearchFromHash() {
         if (!isVocabularyLoaded) return;
     
         let hash = decodeURIComponent(window.location.hash.substring(1));
-    
-        // Convert to lowercase with Turkish-specific rules
         hash = toTurkishLowerCase(hash);
-    
-        // Remove invalid characters, allow only Turkish alphabet and space
         const cleanedHash = hash.replace(/[^abcçdefgğhıijklmnoöprsştuüvyz ]/g, '');
     
-        // Redirect based on the conditions outlined
         if (cleanedHash === "") {
+            // URL boş ise ana sayfaya yönlendir ve copyButton'ı gizle
             window.history.replaceState(null, null, `/`);
+            copyButton.style.display = 'none';
         } else {
             window.history.replaceState(null, null, `#${encodeURIComponent(cleanedHash)}`);
-        }
-    
-        // Apply the cleaned hash to search box and initiate the search
-        if (cleanedHash) {
             searchBox.value = cleanedHash;
             updateSearch(cleanedHash);
             updateSearchBoxPlaceholder(cleanedHash);
-            updateTotalEntriesDisplay();
-            clickableWords();
+            
+            // copyButton'ı güncelle
+            updateCopyButton();
         }
     }
+    
     
     function toTurkishLowerCase(str) {
         return str
@@ -56,7 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             .toLowerCase();
     }
     
-    // Ensure this function is called when the hash changes
     window.addEventListener('hashchange', loadSearchFromHash);
     
     window.addEventListener('load', async () => {
@@ -66,7 +59,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const isLoaded = await loadData();
         if (isLoaded) {
-            // Run `loadSearchFromHash` after data loading is confirmed
             loadSearchFromHash();
         }
     });
@@ -78,6 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             searchBox.value = hash;
             updateSearch(hash);
             updateSearchBoxPlaceholder(hash);
+            updateCopyButton(); 
         } else {
             resultDiv.classList.add('hidden');
             ghostText.textContent = '';
@@ -93,29 +86,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     searchBox.addEventListener('input', (e) => {
         let query = e.target.value;
     
-        // Türkçe büyük harfleri küçük harfe dönüştür
         query = toTurkishLowerCase(query);
-    
-        // Alfanumerik ve boşluk dışındaki karakterleri kaldır
         query = query.replace(/[^abcçdefgğhıijklmnoöprsştuüvyz ]/gi, '');
-    
-        // Birden fazla ardışık boşluğu tek boşluğa indir
         query = query.replace(/\s{2,}/g, ' ');
     
-        e.target.value = query; // Güncellenmiş değeri arama kutusuna yazdır
+        e.target.value = query;
     
         updateSearchBoxPlaceholder(query);
-        searchWord(query);
+        updateSearch(query); // Güncellenen arama sorgusunu updateSearch ile işliyoruz
     });
     
     
-    function updateSearch(query) {
-        const formattedQuery = toTurkishLowerCase(query).toLowerCase(); // Küçük harfe çevir
     
+    function updateSearch(query) {
+        const formattedQuery = toTurkishLowerCase(query).toLowerCase(); 
+        
         if (dictionaryData && Object.keys(dictionaryData).length > 0) {
             searchWord(formattedQuery);
     
-            // Instantly update the hash in the URL
+            // URL’yi anlık olarak güncelle
             if (query) {
                 window.history.replaceState(null, null, `#${encodeURIComponent(formattedQuery)}`);
             } else {
@@ -125,45 +114,69 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Dictionary data not loaded.');
         }
     }
+    
 
 let lastGhostText = "";
 
 let lastCombinedText = "";
 
 function searchWord(query) {
+    const resultDiv = document.getElementById('result');
+    const copyButton = document.getElementById('copyButton');
+    const searchContainer = document.querySelector('.search-box');
+    const ghostText = document.getElementById('ghostText');
+
+    // Aynı sorgu tekrar girildiyse işlemi durdur
     if (query === lastQuery) return;
 
     lastQuery = query;
-    resultDiv.innerHTML = ''; // Clear result area
+    resultDiv.innerHTML = ''; // Sonuç alanını temizle
 
-    // Handle case for empty input
+    // Eğer sorgu boşsa veya geçersizse işlemi durdur ve copyButton'ı gizle
     if (query.trim().length === 0) {
         searchContainer.classList.remove('error');
+        searchBox.classList.remove('error');
         ghostText.textContent = "";
-        wordCountElement.style.backgroundColor = ''; // Reset background color to green
         lastCombinedText = ""; 
+        copyButton.style.display = 'none';
         return;
     } else if (query.startsWith(' ')) {
-        // Error state if input starts with a space
         searchContainer.classList.add('error');
-        wordCountElement.style.backgroundColor = '#dc3545'; // Set background color to red
+        searchBox.classList.add('error');
         ghostText.textContent = "";
         lastCombinedText = ""; 
+        copyButton.style.display = 'none';
         return;
     } else {
         searchContainer.classList.remove('error');
-        wordCountElement.style.backgroundColor = ''; // Reset background color if valid input
+        searchBox.classList.remove('error');
     }
 
     const normalizedQuery = normalizeTurkish(query);
 
-    // Find the closest alphabetically matching word
+    // Eşleşen kelimeleri bul
     const matchingWords = Object.keys(dictionaryData)
         .map(word => ({ word: normalizeTurkish(word), original: word }))
         .filter(({ word }) => word.startsWith(normalizedQuery))
         .sort((a, b) => a.word.localeCompare(b.word));
 
+    // Eşleşme durumuna göre copyButton'ı etkin veya pasif yap
     if (matchingWords.length > 0) {
+        // Eşleşme bulunduysa buton rengi --main-aluminium ve etkin
+        copyButton.style.color = 'var(--main-aluminium)';
+        copyButton.style.display = 'block';
+        copyButton.disabled = false; // Butonu etkinleştir
+    } else {
+        // Eşleşme yoksa buton rengi kırmızı (#dc3545) ve pasif
+        copyButton.style.color = '#dc3545';
+        copyButton.disabled = true; // Butonu pasif yap
+    }
+
+    // Eşleşen kelime varsa sonuçları göster
+    if (matchingWords.length > 0) {
+        searchContainer.classList.remove('error');
+        searchBox.classList.remove('error');
+
         const closestWord = matchingWords[0];
         const wordDetails = dictionaryData[closestWord.original];
         const description = wordDetails.a.replace(/\n/g, "<br>");
@@ -173,27 +186,25 @@ function searchWord(query) {
         
         resultDiv.appendChild(descriptionElement);
 
-        // Update ghost text with the closest alphabetic match
         const newGhostText = closestWord.word.substring(query.length);
         const newCombinedText = query + newGhostText;
 
         if (newCombinedText !== lastCombinedText) {
             ghostText.textContent = newGhostText;
             lastCombinedText = newCombinedText;
-
-            // Fade-in animation for resultDiv
             resultDiv.style.animation = 'none'; 
             resultDiv.offsetHeight; 
             resultDiv.style.animation = 'fadeIn 1s ease-in-out';
-
             loadAnimation();
         }
+
+        copyButton.style.display = 'block'; // Butonu göster
     } else {
+        // Eşleşme yoksa hata durumunu ayarla
         ghostText.textContent = "";
         lastCombinedText = ""; 
-        wordCountElement.style.backgroundColor = '#dc3545'; // Change background color to red
         searchContainer.classList.add('error');
-        document.getElementById('totalEntries').textContent = `${Object.keys(dictionaryData).length}`;
+        searchBox.classList.add('error');
     }
 
     createClickableWords();
@@ -203,13 +214,9 @@ function searchWord(query) {
 
 
 
-    
-    
-    
-  // Prevent right-click menu
+
   document.addEventListener('contextmenu', event => event.preventDefault());
 
-  // Prevent Ctrl+C, Ctrl+X, Ctrl+V, and Print Screen
   document.addEventListener('keydown', (event) => {
     const forbiddenKeys = ['c', 'x', 'v', 'p', 'u'];
     if ((event.ctrlKey || event.metaKey) && forbiddenKeys.includes(event.key)) {
@@ -217,24 +224,21 @@ function searchWord(query) {
     }
   });
 
-  // Detect and block Print Screen
   window.addEventListener('keyup', (event) => {
     if (event.key === 'PrintScreen') {
       navigator.clipboard.writeText('');
     }
   });
 
-  // Disable selection
   document.addEventListener('selectstart', event => event.preventDefault());
 
     function createClickableWords() {
-        const wordsArray = Object.keys(clickableWords).sort((a, b) => b.length - a.length); // Önce uzun kelimeleri işle
+        const wordsArray = Object.keys(clickableWords).sort((a, b) => b.length - a.length); 
     
         wordsArray.forEach(word => {
-            const escapedWord = word.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1"); // Özel karakterleri kaçır
-            const regex = new RegExp(`(?<=^|\\s|\\\\n|>)${escapedWord}(?=\\s|\\\\n|<|$)`, 'g'); // Tam kelimeyi bul, devamında başka harf olmadığından emin ol
-    
-            // Eşleşme varsa span ile sar
+            const escapedWord = word.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1"); 
+            const regex = new RegExp(`(?<=^|\\s|\\\\n|>)${escapedWord}(?=\\s|\\\\n|<|$)`, 'g'); 
+
             resultDiv.innerHTML = resultDiv.innerHTML.replace(
                 regex,
                 `<span class="clickable-word" data-word="${word}">${word}</span>`
@@ -245,59 +249,45 @@ function searchWord(query) {
         clickableElements.forEach(element => {
             element.addEventListener('click', function () {
                 const word = this.getAttribute('data-word');
-                this.classList.add('n'); // Seçili durumu işaretle
-                showWordMeanings(word, this); // Anlamı göster
+                this.classList.add('n'); 
+                showWordMeanings(word, this); 
             });
         });
     }
-    
-    
-    
 
     function showWordMeanings(word, element) {
         const meanings = clickableWords[word];
-
         const existingTooltips = document.querySelectorAll('.tooltip');
         existingTooltips.forEach(tooltip => tooltip.remove());
-
         if (meanings && meanings.length > 0) {
             if (!currentMeaningIndex[word]) {
                 currentMeaningIndex[word] = 0;
             }
-
             const tooltip = document.createElement('div');
             tooltip.className = 'tooltip';
-
             let meaning = "";
             meanings[currentMeaningIndex[word]].forEach(tempMeaning => meaning += tempMeaning + "<br>");
             tooltip.innerHTML = meaning;
-
             document.body.appendChild(tooltip);
-
             const elementRect = element.getBoundingClientRect();
             tooltip.style.position = 'absolute';
             tooltip.style.display = 'block';
-
             const tooltipRect = tooltip.getBoundingClientRect();
             let top = elementRect.top + window.scrollY - tooltipRect.height - 5;
             let left = elementRect.left + window.scrollX + (elementRect.width / 2) - (tooltipRect.width / 2);
-
             if (left + tooltipRect.width > window.innerWidth) {
                 left = window.innerWidth - tooltipRect.width - 5;
             }
             if (left < 0) {
                 left = 5;
             }
-
             tooltip.style.top = `${top}px`;
             tooltip.style.left = `${left}px`;
-
             tooltip.style.opacity = 0;
             tooltip.style.transition = 'opacity 0.3s ease-in-out';
             setTimeout(() => {
                 tooltip.style.opacity = 1;
             }, 50);
-
             element.addEventListener('mouseleave', function () {
                 tooltip.style.opacity = 0;
                 setTimeout(() => {
@@ -305,11 +295,10 @@ function searchWord(query) {
                    element.classList.remove('n')
                 }, 300);
             });
-
             currentMeaningIndex[word] = (currentMeaningIndex[word] + 1) % meanings.length;
         }
     }
-
+    
     function normalizeTurkish(text) {
         return text.replace(/İ/g, 'i').replace(/I/g, 'ı').toLowerCase();
     }
@@ -395,68 +384,51 @@ function searchWord(query) {
     let headings = [];
 
     async function loadData() {
-        const totalEntriesElement = document.getElementById('totalEntries');
         const searchBox = document.getElementById('searchBox');
         let allDataLoaded = true;
 
         try {
-            // Load clickableWords.json
             const clickableWordsResponse = await fetch('vocabulary/clickableWords.json');
             if (!clickableWordsResponse.ok) throw new Error('clickableWords could not be loaded');
             const clickableWordsJson = await clickableWordsResponse.json();
             clickableWords = clickableWordsJson.clickableWords;
 
-            // Load specialWords.json
             const specialWordsResponse = await fetch('vocabulary/specialWords.json');
             if (!specialWordsResponse.ok) throw new Error('specialWords could not be loaded');
             const specialWordsJson = await specialWordsResponse.json();
             specialWords = specialWordsJson.specialWords;
 
-            // Load entryWords.json
             const entryWordsResponse = await fetch('vocabulary/entryWords.json');
             if (!entryWordsResponse.ok) throw new Error('entryWords could not be loaded');
             const entryWordsJson = await entryWordsResponse.json();
             entryWords = entryWordsJson.entryWords;
 
-            // Load typeWords.json
             const typeWordsResponse = await fetch('vocabulary/typeWords.json');
             if (!typeWordsResponse.ok) throw new Error('typeWords could not be loaded');
             const typeWordsJson = await typeWordsResponse.json();
             typeWords = typeWordsJson.typeWords;
 
-            const wordCount = Object.keys(entryWords).length;
-            totalEntriesElement.textContent = `${wordCount}`;
-
             dictionaryData = entryWords;
             wrapClickableWords();
             isVocabularyLoaded = true;
-
             searchBox.disabled = false;
+
+            // `words` dizisini JSON dosyalarındaki kelime sayılarına göre güncelle
+            words = [
+                `${Object.keys(entryWords).length} entries`,
+                `${Object.keys(clickableWords).length} suffixes`,
+                `${Object.keys(specialWords).length} languages`
+            ];
+
         } catch (error) {
             console.error('Error:', error);
             allDataLoaded = false;
-
-            // If any JSON file fails to load, disable the search box after 2 seconds
             setTimeout(() => {
                 searchBox.disabled = true;
-            }, 2000);
+            }, 1000);
         }
-
-        // Display an error icon if the files do not load successfully
-        if (!allDataLoaded) {
-            totalEntriesElement.innerHTML = '<img src="images/error.svg" width="20" height="20">';
-            document.documentElement.style.setProperty('--main-red', '#dc3545');
-        }
-
         return allDataLoaded;
     }
-
-
-    
-    
-    
-    
-    
     
 
 let loaderAnimationTimeout = null;
@@ -469,40 +441,6 @@ function loadAnimation() {
         loader.classList.remove('animate');
     }, 1000)
 }
-   
-document.getElementById('totalEntries').addEventListener('click', async () => {
-    const totalEntriesElement = document.getElementById('totalEntries');
-    const searchBox = document.getElementById('searchBox');
-    const query = searchBox.value.trim();
-
-    const isCopyIconActive = totalEntriesElement.querySelector('img[src="images/copy.svg"]') !== null;
-
-    if (isCopyIconActive && dictionaryData[query]) {
-        // Görünen sonuçtan açıklamayı alır
-        const descriptionElement = document.querySelector('#result .description');
-        const description = descriptionElement ? descriptionElement.textContent.trim() : '';
-
-        const clipboardContent = `${description}\n\nSource: ${window.location.href}`;
-
-        try {
-            await navigator.clipboard.writeText(clipboardContent); // Panoya kopyala
-        } catch (err) {
-            console.error('Failed to copy:', err);
-        }
-    } else {
-        // Eğer kopya simgesi aktif değilse, URL hash'inde rastgele bir kelime gösterir
-        const entries = Object.keys(entryWords);
-        if (entries.length > 0) {
-            const randomEntry = entries[Math.floor(Math.random() * entries.length)];
-            window.location.hash = `#${randomEntry}`;
-        } else {
-            console.warn('No entries found in vocabulary.');
-        }
-    }
-});
-
-    
-
     function getTextWidth(text, fontSize) {
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
@@ -510,43 +448,18 @@ document.getElementById('totalEntries').addEventListener('click', async () => {
         return context.measureText(text).width;
     }
     
-function changeCssVariable() { 
-  document.documentElement.style.setProperty('--main-red', 'var(--main-darkgreen)');
-}
+    
+const copyButton = document.getElementById('copyButton');
 
-fetch('vocabulary/entryWords.json')
-  .then(response => {
-    if (response.ok) {
-      return response.json();
-    } else {
-      throw new Error('Dosya yüklenemedi');
-    }
-  })
-  .then(data => {
-    // Update CSS variables as needed
-    changeCssVariable();
+searchBox.addEventListener('input', () => {
+    const query = searchBox.value.trim();
+    updateSearchBoxPlaceholder(query);
+    searchWord(query);
 
-    // Get the total entries and display the count
-    const totalEntriesElement = document.getElementById('totalEntries');
-    const wordCount = Object.keys(data.entryWords).length;
-    totalEntriesElement.textContent = `${wordCount}`;
-  })
-  .catch(error => {
-    console.error(error);
+    // Show or hide the copy button based on input content
+    copyButton.style.display = query.length > 0 ? 'block' : 'none';
+});
 
-    // Show error icon if the file load fails
-    const totalEntriesElement = document.getElementById('totalEntries');
-    totalEntriesElement.innerHTML = '<img src="images/error.svg" width="20" height="20">';
-  });
-
-
-  
-
-    searchBox.addEventListener('input', () => {
-        const query = searchBox.value;
-        updateSearchBoxPlaceholder(query);
-        searchWord(query);
-    });
 
     document.querySelector('#result').addEventListener('click', (e) => {
         if (e.target.classList.contains('searchable')) {
@@ -555,104 +468,94 @@ fetch('vocabulary/entryWords.json')
             searchBox.dispatchEvent(new Event('input'));
         }
     });
-    // Monitor changes in the search box
-document.getElementById('searchBox').addEventListener('input', updateTotalEntriesDisplay);
-
-function updateTotalEntriesDisplay() {
+    document.getElementById('copyButton').addEventListener('click', () => {
     const searchBox = document.getElementById('searchBox');
-    const totalEntriesElement = document.getElementById('totalEntries');
-    const query = searchBox.value.trim(); // Trim whitespace to handle edge cases
-    const isError = searchContainer.classList.contains('error'); // Check if there's an error
-
-    const wordCount = Object.keys(entryWords).length;
-
-    if (isError || query === "") { 
-        // If input is empty or contains an error, show the total entries count
-        totalEntriesElement.textContent = `${wordCount}`;
-    } else if (dictionaryData[query] && !searchBox.value.endsWith(" ")) {
-        // If query matches a word in the dictionary and has no trailing space, show the copy icon
-        totalEntriesElement.innerHTML = '<img src="images/copy.svg">';
-    } else {
-        // If input has trailing space or doesn't match a word, show total entries count
-        totalEntriesElement.textContent = `${wordCount}`;
-    }
-
-    // Update the URL hash based on the input value
-    if (query) {
-        window.history.replaceState(null, null, `#${encodeURIComponent(query)}`);
-    } else {
-        window.history.replaceState(null, null, `#`);
-    }
-}
-
-
-
-
-
-// Add click event listener for totalEntries to handle copying or showing a random word
-document.getElementById('totalEntries').addEventListener('click', async () => {
-    const totalEntriesElement = document.getElementById('totalEntries');
-    const searchBox = document.getElementById('searchBox');
-    const query = searchBox.value.trim();
-
-    const isCopyIconActive = totalEntriesElement.querySelector('img[src="images/copy.svg"]') !== null;
-
-    if (isCopyIconActive && dictionaryData[query]) {
-        // Get the description from the visible result
-        const descriptionElement = document.querySelector('#result .description');
-        const description = descriptionElement ? descriptionElement.textContent.trim() : '';
-
-        const clipboardContent = `${query}\n\n\n${description}\n\n\n\nsource: ${window.location.href}`;
-
-        try {
-            await navigator.clipboard.writeText(clipboardContent); // Copy to clipboard
-        } catch (err) {
-            console.error('Failed to copy:', err);
-        }
-    } else {
-        // If the copy icon isn't active, select a random word and trigger a search
-        const entries = Object.keys(entryWords);
-        if (entries.length > 0) {
-            const randomEntry = entries[Math.floor(Math.random() * entries.length)];
-            searchBox.value = randomEntry;  // Set the search box value
-            searchBox.dispatchEvent(new Event('input')); // Trigger input event to update UI
-        } else {
-            console.warn('No entries found in vocabulary.');
-        }
+    const resultDiv = document.getElementById('result');
+    const searchQuery = searchBox.value.trim();
+    const searchResult = resultDiv.textContent.trim();
+    const sourceUrl = window.location.href;
+    const copyButton = document.getElementById('copyButton');
+    
+    copyButton.copyLabel = '';
+    copyButton.successLabel = '';
+    if (searchQuery && searchResult) {
+        const copyText = `${searchQuery}\n\n\n${searchResult}\n\n\n\nSource: ${sourceUrl}`;
+        navigator.clipboard.writeText(copyText).catch(err => {
+            console.error('Kopyalama hatası:', err);
+        });
     }
 });
-async function copyToClipboard() {
-    const totalEntriesElement = document.getElementById('totalEntries');
-    const searchBox = document.getElementById('searchBox');
-    const query = searchBox.value.trim();
 
-    // Kopyalama işlemi ve içerik ayarları
-    if (dictionaryData[query]) {
-        const descriptionElement = document.querySelector('#result .description');
-        const description = descriptionElement ? descriptionElement.textContent.trim() : '';
-        const clipboardContent = `${query}\n\n${description}`;
+copyButton.style.display = 'none';
+    const animatedText = document.getElementById('animatedText');
+    function animateText() {
+        if (searchBox.value || document.activeElement === searchBox) {
+            animatedText.style.display = 'none';
+            return;
+        }
 
-        try {
-            await navigator.clipboard.writeText(clipboardContent);
+        animatedText.style.display = 'block';
+        animatedText.textContent = words[wordIndex];
+        animatedText.style.animation = 'none';
+        void animatedText.offsetWidth;  // Reflow tetikleme
+        animatedText.style.animation = 'slideInOut 2s ease-in-out';
 
-            // Kopyalama başarılı olduğunda 'copied' sınıfını ekleyin
-            totalEntriesElement.classList.add('copied');
-            
-            // 'Copied!' baloncuğunu 1.5 saniye sonra gizlemek için zamanlayıcı
-            setTimeout(() => {
-                totalEntriesElement.classList.remove('copied');
-            }, 500);
-        } catch (err) {
-            console.error('Panoya kopyalanamadı:', err);
+        wordIndex = (wordIndex + 1) % words.length;
+        animationInterval = setTimeout(animateText, 2000);
+    }
+
+    // `loadData` tamamlandığında animasyon başlasın
+    const dataLoaded = await loadData();
+    if (dataLoaded && !searchBox.value) {
+        setTimeout(animateText, 500);  // 0.5 saniye sonra animasyonu başlat
+    }
+
+    // `input` olayında animasyonu kontrol et
+    searchBox.addEventListener('input', () => {
+        if (searchBox.value) {
+            animatedText.style.display = 'none';
+        } else if (!document.activeElement === searchBox) {
+            animateText();
+        }
+    });
+
+    // `focus` olayında animasyonu durdur
+    searchBox.addEventListener('focus', () => {
+        animatedText.style.display = 'none';
+        clearTimeout(animationInterval);
+    });
+
+    // `blur` olayında ve `searchBox` boşsa animasyonu başlat
+    searchBox.addEventListener('blur', () => {
+        if (!searchBox.value) animateText();
+    });
+    function updateCopyButton() {
+        const query = searchBox.value.trim();
+        
+        if (query) {
+            // Query ile eşleşen bir kelime olup olmadığını kontrol et
+            const normalizedQuery = normalizeTurkish(query);
+            const matchingWords = Object.keys(dictionaryData)
+                .map(word => normalizeTurkish(word))
+                .filter(word => word.startsWith(normalizedQuery));
+    
+            if (matchingWords.length > 0) {
+                // Eşleşme bulunduğunda, buton görünür ve --main-aluminium renginde olur
+                copyButton.style.display = 'block';
+                copyButton.style.color = 'var(--main-aluminium)';
+                copyButton.disabled = false;
+            } else {
+                // Eşleşme bulunmadığında, buton kırmızı (#dc3545) olur ve pasif hale gelir
+                copyButton.style.display = 'block';
+                copyButton.style.color = '#dc3545';
+                copyButton.disabled = true;
+            }
+        } else {
+            // Sorgu boş olduğunda butonu gizle
+            copyButton.style.display = 'none';
+            copyButton.disabled = true;
         }
     }
-}
-
-// totalEntries butonuna tıklandığında kopyalama işlemini başlatın
-document.getElementById('totalEntries').addEventListener('click', copyToClipboard);
-
-
     
     
-
 });
